@@ -7,6 +7,16 @@ android {
     namespace 'ru.abyzbaev.maps'
     compileSdk 34
 
+    buildTypes.each {
+        Properties properties = new Properties()
+        properties.load(project.rootProject.file("apikey.properties").newDataInputStream())
+        def apiKey = properties.getProperty("MAPKIT_API_KEY", "")
+        it.buildConfigField "String", "MAPKIT_API_KEY", apiKey
+        buildFeatures {
+            viewBinding = true
+        }
+    }
+
     defaultConfig {
         applicationId "ru.abyzbaev.maps"
         minSdk 24
@@ -41,4 +51,6 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+
+    implementation 'com.yandex.android:maps.mobile:4.4.0-lite'
 }
