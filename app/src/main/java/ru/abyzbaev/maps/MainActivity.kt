@@ -18,14 +18,16 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
-import com.yandex.mapkit.map.CameraPosition
-import com.yandex.mapkit.map.MapWindow
+import com.yandex.mapkit.layers.GeoObjectTapEvent
+import com.yandex.mapkit.layers.GeoObjectTapListener
+import com.yandex.mapkit.map.*
+import com.yandex.mapkit.map.Map
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.runtime.image.ImageProvider
 import ru.abyzbaev.maps.databinding.ActivityMainBinding
 import java.security.Permission
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), InputListener, GeoObjectTapListener {
     private var _binding: ActivityMainBinding? = null
     private val binding get() = _binding!!
 
@@ -44,6 +46,9 @@ class MainActivity : AppCompatActivity() {
         Log.d("####","lat = $latitude, lon = $longitude")
         moveMapToCurrentLocation()
         setMyPositionMark()
+
+        binding.mapview.map.addTapListener(this)
+        binding.mapview.map.addInputListener(this)
     }
 
 
@@ -121,22 +126,22 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setMyPositionMark() {
-        val placemark = binding.mapview.map.mapObjects.addPlacemark().apply {
+        val placeMark = binding.mapview.map.mapObjects.addPlacemark().apply {
             val imageProvider = ImageProvider.fromResource(this@MainActivity,R.drawable.pos)
             imageProvider.image.scale(30, 30, false)
             geometry = Point(latitude, longitude)
             setIcon(imageProvider)
         }
     }
-
-
-
-
-
-
-
-
-
+    private fun setMark(point: Point) {
+        val placeMark = binding.mapview.map.mapObjects.addPlacemark().apply {
+            val imageProvider = ImageProvider.fromResource(this@MainActivity,
+                R.drawable.placemark_icon
+            )
+            geometry = Point(point.latitude, point.longitude)
+            setIcon(imageProvider)
+        }
+    }
 
     private fun moveMapToCurrentLocation() {
         binding.mapview.map.move(
@@ -164,5 +169,19 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         private const val LOCATION_PERMISSION_REQUEST_CODE  = 123 // Вы можете выбрать любой уникальный код
+    }
+
+    override fun onMapTap(p0: Map, p1: Point) {
+        Toast.makeText(this, "TAP", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onMapLongTap(p0: Map, p1: Point) {
+        setMark(p1)
+        Toast.makeText(this, "LONG TAP", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onObjectTap(p0: GeoObjectTapEvent): Boolean {
+        Toast.makeText(this, "GEO OBJECT TAP", Toast.LENGTH_SHORT).show()
+        return true
     }
 }
