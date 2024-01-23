@@ -1,6 +1,7 @@
 package ru.abyzbaev.maps
 
-import android.graphics.Point
+import com.yandex.mapkit.geometry.Point
+
 
 data class Marker(
     var point: Point,

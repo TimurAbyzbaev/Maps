@@ -14,6 +14,8 @@ import androidx.constraintlayout.motion.widget.Debug.getLocation
 import androidx.core.app.ActivityCompat
 import androidx.core.graphics.scale
 import androidx.fragment.app.DialogFragment
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.yandex.mapkit.MapKitFactory
@@ -31,6 +33,8 @@ class MainActivity : AppCompatActivity(), InputListener, GeoObjectTapListener {
     private var _binding: ActivityMainBinding? = null
     private val binding get() = _binding!!
 
+    private lateinit var viewModel: MarkersViewModel
+
     // 55.7522, 37.6156 Москва
     private var latitude = 55.7522
     private var longitude = 37.6156
@@ -39,6 +43,8 @@ class MainActivity : AppCompatActivity(), InputListener, GeoObjectTapListener {
         super.onCreate(savedInstanceState)
         _binding = ActivityMainBinding.inflate(layoutInflater)
         MapKitFactory.initialize(this)
+
+        initViewModel()
 
         setContentView(binding.root)
 
@@ -49,6 +55,14 @@ class MainActivity : AppCompatActivity(), InputListener, GeoObjectTapListener {
 
         binding.mapview.map.addTapListener(this)
         binding.mapview.map.addInputListener(this)
+    }
+
+    private fun initViewModel() {
+        viewModel = MarkersViewModel()
+        viewModel.subscribeToLiveData().observe(this, Observer {
+            Toast.makeText(this@MainActivity, "Subscribed to liveData", Toast.LENGTH_SHORT).show()
+
+        })
     }
 
 
@@ -131,6 +145,7 @@ class MainActivity : AppCompatActivity(), InputListener, GeoObjectTapListener {
             imageProvider.image.scale(30, 30, false)
             geometry = Point(latitude, longitude)
             setIcon(imageProvider)
+            viewModel.addMark(Marker(geometry, "Current location", " My current location"))
         }
     }
     private fun setMark(point: Point) {
@@ -140,6 +155,7 @@ class MainActivity : AppCompatActivity(), InputListener, GeoObjectTapListener {
             )
             geometry = Point(point.latitude, point.longitude)
             setIcon(imageProvider)
+            viewModel.addMark(Marker(geometry, "Point ${viewModel.getSize()}", ""))
         }
     }
 
