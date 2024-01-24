@@ -29,6 +29,7 @@ class MapViewModel : ViewModel() {
 
     fun removeMarker(markerToDelete: Marker) {
         markers.remove(markerToDelete)
+        _liveData.postValue(markers)
     }
 
     fun editMarker(marker: Marker) {

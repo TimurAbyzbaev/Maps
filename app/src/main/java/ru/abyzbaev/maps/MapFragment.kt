@@ -53,7 +53,7 @@ class MapFragment : Fragment(), InputListener, GeoObjectTapListener {
         return binding.root
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProvider(this)[MapViewModel::class.java]
         // TODO: Use the ViewModel
