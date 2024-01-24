@@ -6,14 +6,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import ru.abyzbaev.maps.MapViewModel
 import ru.abyzbaev.maps.Marker
+import ru.abyzbaev.maps.R
 import ru.abyzbaev.maps.databinding.FragmentMarkersListBinding
 import ru.abyzbaev.maps.itemtouchhelper.OnItemDismissListener
 import ru.abyzbaev.maps.itemtouchhelper.SimpleItemTouchHelperCallback
+import ru.abyzbaev.maps.markerDetails.DetailsMarkerFragment
 
 class MarkersListFragment: Fragment(), OnItemDismissListener {
 
@@ -22,7 +25,21 @@ class MarkersListFragment: Fragment(), OnItemDismissListener {
 
     private lateinit var viewModel: MapViewModel
 
-    private val adapter = MarkersListAdapter(this)
+    private val adapter: MarkersListAdapter by lazy {
+        MarkersListAdapter({
+            marker -> navigateToDetails(marker)
+        }, this)
+    }
+
+    private fun navigateToDetails(marker: Marker) {
+        requireActivity().supportFragmentManager
+            .beginTransaction()
+            .addToBackStack("")
+            //.add(DetailsMarkerFragment.newInstance(marker), "FRAGMENT_TAG")
+            .replace(R.id.fragment_container, DetailsMarkerFragment.newInstance(marker))
+            .commit()
+    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
