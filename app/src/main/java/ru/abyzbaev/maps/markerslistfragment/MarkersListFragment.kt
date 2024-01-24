@@ -8,17 +8,21 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.ItemTouchHelper
 import ru.abyzbaev.maps.MapViewModel
+import ru.abyzbaev.maps.Marker
 import ru.abyzbaev.maps.databinding.FragmentMarkersListBinding
+import ru.abyzbaev.maps.itemtouchhelper.OnItemDismissListener
+import ru.abyzbaev.maps.itemtouchhelper.SimpleItemTouchHelperCallback
 
-class MarkersListFragment: Fragment() {
+class MarkersListFragment: Fragment(), OnItemDismissListener {
 
     private var _binding: FragmentMarkersListBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var viewModel: MapViewModel
 
-    private val adapter = MarkersListAdapter()
+    private val adapter = MarkersListAdapter(this)
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,6 +39,10 @@ class MarkersListFragment: Fragment() {
 
         initViewModel()
         binding.recyclerViewMarkers.adapter = adapter
+
+        val callback: ItemTouchHelper.Callback = SimpleItemTouchHelperCallback(adapter)
+        val touchHelper: ItemTouchHelper = ItemTouchHelper(callback)
+        touchHelper.attachToRecyclerView(binding.recyclerViewMarkers)
     }
 
     private fun initViewModel() {
@@ -47,5 +55,9 @@ class MarkersListFragment: Fragment() {
         viewModel.subscribeToLiveData().observe(this.viewLifecycleOwner, Observer {
             adapter.setData(it)
         })
+    }
+
+    override fun onItemDismiss(marker: Marker) {
+        viewModel.removeMarker(marker)
     }
 }
