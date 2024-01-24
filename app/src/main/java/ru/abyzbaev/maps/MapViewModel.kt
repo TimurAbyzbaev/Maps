@@ -33,7 +33,10 @@ class MapViewModel : ViewModel() {
     }
 
     fun editMarker(marker: Marker) {
-
+        (markers.find { it.point == marker.point }?.apply {
+            this.name = marker.name
+            this.description = marker.description
+        })
     }
     fun getSize() = markers.size
 }
