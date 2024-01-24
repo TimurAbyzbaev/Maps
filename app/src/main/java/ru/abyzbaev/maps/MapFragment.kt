@@ -38,7 +38,6 @@ class MapFragment : Fragment(), InputListener, GeoObjectTapListener {
     private var markers: MutableList<Marker> = arrayListOf()
 
     companion object {
-        fun newInstance() = MapFragment()
         private const val LOCATION_PERMISSION_REQUEST_CODE  = 123 // Вы можете выбрать любой уникальный код
 
     }
@@ -56,7 +55,6 @@ class MapFragment : Fragment(), InputListener, GeoObjectTapListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProvider(this)[MapViewModel::class.java]
-        // TODO: Use the ViewModel
         MapKitFactory.initialize(requireContext())
         initViewModel()
         requestLocationPermission()
@@ -65,6 +63,9 @@ class MapFragment : Fragment(), InputListener, GeoObjectTapListener {
         setMyPositionMark()
         binding.mapview.map.addTapListener(this)
         binding.mapview.map.addInputListener(this)
+        binding.currentLocationButton.setOnClickListener {
+            moveMapToCurrentLocation()
+        }
 
         for (marker in markers) {
             drawMarker(marker.point)
@@ -95,7 +96,7 @@ class MapFragment : Fragment(), InputListener, GeoObjectTapListener {
             ActivityCompat.requestPermissions(
                 requireActivity(),
                 arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                MapFragment.LOCATION_PERMISSION_REQUEST_CODE
+                LOCATION_PERMISSION_REQUEST_CODE
             )
         }
     }
@@ -118,14 +119,14 @@ class MapFragment : Fragment(), InputListener, GeoObjectTapListener {
             if (lastKnownLocation != null) {
                 latitude = lastKnownLocation.latitude
                 longitude = lastKnownLocation.longitude
-                // Теперь у вас есть широта и долгота
+                // Теперь есть широта и долгота
                 Log.d("Location", "Latitude: $latitude, Longitude: $longitude")
             } else {
                 // Местоположение неизвестно или недоступно
                 Log.e("Location", "Unable to retrieve location.")
             }
         } else {
-            // Разрешение не предоставлено, обработайте этот случай
+            // Разрешение не предоставлено, обработка этого случая
             Log.e("Location", "Location permission not granted.")
         }
     }
@@ -156,7 +157,7 @@ class MapFragment : Fragment(), InputListener, GeoObjectTapListener {
     }
 
     private fun setMyPositionMark() {
-        val placeMark = binding.mapview.map.mapObjects.addPlacemark().apply {
+        binding.mapview.map.mapObjects.addPlacemark().apply {
             val imageProvider = ImageProvider.fromResource(requireActivity(),R.drawable.pos)
             imageProvider.image.scale(30, 30, false)
             geometry = Point(latitude, longitude)
@@ -165,7 +166,7 @@ class MapFragment : Fragment(), InputListener, GeoObjectTapListener {
     }
 
     private fun drawMarker(point: Point) {
-        val placeMark = binding.mapview.map.mapObjects.addPlacemark().apply {
+        binding.mapview.map.mapObjects.addPlacemark().apply {
             val imageProvider = ImageProvider.fromResource(
                 requireActivity(),
                 R.drawable.placemark_icon
@@ -177,7 +178,7 @@ class MapFragment : Fragment(), InputListener, GeoObjectTapListener {
 
 
     private fun setMark(point: Point) {
-        val placeMark = binding.mapview.map.mapObjects.addPlacemark().apply {
+        binding.mapview.map.mapObjects.addPlacemark().apply {
             val imageProvider = ImageProvider.fromResource(requireActivity(),
                 R.drawable.placemark_icon
             )
